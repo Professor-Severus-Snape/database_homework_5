@@ -4,7 +4,7 @@ import psycopg2
 def delete_db(cursor):
     """ Функция, удаляющая базу данных 'Hogwarts_database'. """
     cursor.execute("DROP TABLE IF EXISTS Hogwarts_staff, Telephone_number CASCADE;")
-    # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+    conn.commit()
     print('База данных \'Hogwarts_database\' была полностью удалена.')
 
 
@@ -51,7 +51,7 @@ def create_db(cursor):
             phone_number BIGINT UNIQUE NOT NULL  
         );
     """)
-    # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+    conn.commit()
     print('База данных \'Hogwarts_database\' создана.')
 
 
@@ -101,7 +101,7 @@ def change_staff(cursor, staff_id, first_name=None, last_name=None, email=None, 
                 UPDATE Hogwarts_staff SET first_name=%s
                 WHERE staff_id=%s;
             """, (first_name, staff_id))
-            # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+            conn.commit()
             print(f'Имя преподавателя с id = \'{staff_id}\' было изменен на = \'{first_name}\'.')
 
         if last_name:
@@ -109,7 +109,7 @@ def change_staff(cursor, staff_id, first_name=None, last_name=None, email=None, 
                 UPDATE Hogwarts_staff SET last_name=%s
                 WHERE staff_id=%s;
             """, (last_name, staff_id))
-            # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+            conn.commit()
             print(f'Фамилия преподавателя с id = \'{staff_id}\' была изменена на = \'{last_name}\'.')
 
         if email:
@@ -118,7 +118,7 @@ def change_staff(cursor, staff_id, first_name=None, last_name=None, email=None, 
                     UPDATE Hogwarts_staff SET email=%s
                     WHERE staff_id=%s;
                 """, (email, staff_id))
-                # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+                conn.commit()
                 print(f'Email преподавателя с id = \'{staff_id}\' был изменен на = \'{email}\'.')
             else:
                 print(f'Преподаватель с email = \'{email}\' уже существует. Изменить email не получится.')
@@ -129,7 +129,7 @@ def change_staff(cursor, staff_id, first_name=None, last_name=None, email=None, 
                     UPDATE Telephone_number SET phone_number=%s
                     WHERE staff_id=%s;
                 """, (phone_number, staff_id))
-                # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+                conn.commit()
                 print(f'Телефон преподавателя с id = \'{staff_id}\' был изменен на = \'{phone_number}\'.')
             else:
                 print(f'Номер телефона \'{phone_number}\' уже есть в базе данных. Изменить телефон не получится.')
@@ -144,7 +144,7 @@ def delete_phone(cursor, phone_number):
             DELETE FROM Telephone_number
             WHERE phone_number = %s
         """, (phone_number, ))
-        # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+        conn.commit()
         print(f'Номер телефона \'{phone_number}\' был удален из базы данных.')
     else:
         print(f'Номер телефона \'{phone_number}\' не найден в базе данных. Удалить номер не получится.')
@@ -161,7 +161,7 @@ def delete_staff(cursor, staff_id):
             DELETE FROM Hogwarts_staff
             WHERE staff_id = %s;
         """, (staff_id, ))
-        # conn.commit()  # нужен ли здесь коммит или можно оставить только один в блоке 'finally' ?
+        conn.commit()
         print('Все данные о преподавателе были успешно удалены.')
     else:
         print(f'Преподаватель с id = \'{staff_id}\' не найден в базе данных. Удалить данные не получится.')
@@ -275,10 +275,9 @@ if __name__ == '__main__':
                 # print(*find_staff(cursor, phone_number=89990000003), sep='\n')
 
     except Exception as error:
-        print(f'Ошибка при работе с PostgreSQL: {error}.')
+        print(f'Ошибка при работе с PostgreSQL: {error}')
 
     finally:
         if conn:
-            conn.commit()  # где делать коммит? здесь или в каждой функции отдельно?
             conn.close()
-            print("Соединение с PostgreSQL закрыто.")
+            print("\nСоединение с PostgreSQL закрыто.")
